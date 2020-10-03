@@ -50,3 +50,7 @@ warmup: ## Warmup the cache
 
 purge: ## Purge cache and logs
 	rm -rf var/cache/* var/logs/*
+
+## —— Coding standards ✨ ——————————————————————————————————————————————————————
+cs: ## Executes php cs fixer
+	$(EXEC_PHP) bash -c "vendor/bin/php-cs-fixer --no-interaction --diff -v fix"
