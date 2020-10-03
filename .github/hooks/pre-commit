@@ -1,0 +1,17 @@
+#!/bin/bash
+
+NOCOLOR='\033[0m'
+REDCOLOR='\033[0;31m'
+GREENCOLOR='\033[0;32m'
+YELLOWCOLOR='\033[0;33m'
+
+PHP_CS_FIXER="make cs"
+CHANGED_FILES=$(git diff --cached --name-only --diff-filter=ACM -- '*.php')
+
+if [ -n "$CHANGED_FILES" ]; then
+    echo -e "$GREENCOLOR php-cs-fixer pre commit hook start$YELLOWCOLOR"
+    $PHP_CS_FIXER $CHANGED_FILES;
+    git add $CHANGED_FILES;
+    echo -e "$GREENCOLOR php-cs-fixer pre commit hook finish$NOCOLOR"
+fi
+
