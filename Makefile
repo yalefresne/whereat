@@ -5,6 +5,8 @@ EXEC_JS	      = $(DOCKER_COMP) exec -T node
 SYMFONY       = $(EXEC_PHP) bin/console
 COMPOSER      = $(DOCKER_COMP) run --rm composer
 YARN 		  = $(EXEC_JS) yarn
+BASH_PHP	  = $(DOCKER_COMP) exec php bash
+BASH_JS 	  = $(DOCKER_COMP) run --rm node sh
 
 .DEFAULT_GOAL := help
 help: ## Outputs this help screen
@@ -20,6 +22,9 @@ help: ## Outputs this help screen
 	else\
 		cp .env .env.local;\
 	fi
+
+## —— Initialize Project 🚀 ————————————————————————————————————————————————————
+init: gc up install ## Initialize the project
 
 ## —— Docker 🐳 ————————————————————————————————————————————————————————————————
 up: docker-compose.yaml ## Start the docker hub
@@ -42,11 +47,32 @@ update: composer.json ## Update vendors according to the composer.json file
 sf: ## List all Symfony commands
 	$(SYMFONY)
 
-cc: ## Clear the cache. DID YOU CLEAR YOUR CACHE????
-	$(SYMFONY) c:c
+cc: ## Clear the cache
+	$(SYMFONY) cache:clear
 
 warmup: ## Warmup the cache
 	$(SYMFONY) cache:warmup
 
 purge: ## Purge cache and logs
 	rm -rf var/cache/* var/logs/*
+
+## —— Doctrine ▶️ ———————————————————————————————————————————————————————————————
+dgm: ## Generate a blank migration class
+	$(SYMFONY) doctrine:migrations:generate
+dmm: ## Execute migrations
+	$(SYMFONY) doctrine:migrations:migrate
+
+## —— Coding standards ✨ ——————————————————————————————————————————————————————
+cs: ## Executes php cs fixer
+	$(EXEC_PHP) bash -c "vendor/bin/php-cs-fixer --no-interaction --diff -v fix"
+
+## —— Config Github ⚙️ ——————————————————————————————————————————————————————————
+gc: ## Config path to Github hook
+	git config core.hooksPath .github/hooks
+
+## —— Tools 🔧 —————————————————————————————————————————————————————————————————
+bp: ## Bash into php container
+	$(BASH_PHP)
+
+bn: ## Bash into node container
+	$(BASH_JS)
