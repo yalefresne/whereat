@@ -1,0 +1,26 @@
+{
+    "devDependencies": {
+        "@babel/core": "^7.12.3",
+        "@symfony/webpack-encore": "^0.31.0",
+        "@vue/babel-helper-vue-jsx-merge-props": "^1.2.1",
+        "@vue/babel-preset-jsx": "^1.2.2",
+        "core-js": "^3.0.0",
+        "css-loader": "^5.0.0",
+        "regenerator-runtime": "^0.13.2",
+        "vue": "^2.6.12",
+        "vue-loader": "^15.9.3",
+        "vue-template-compiler": "^2.6.12",
+        "webpack-notifier": "^1.6.0"
+    },
+    "license": "UNLICENSED",
+    "private": true,
+    "scripts": {
+        "dev-server": "encore dev-server",
+        "dev": "encore dev",
+        "watch": "encore dev --watch",
+        "build": "encore production --progress"
+    },
+    "dependencies": {
+        "yarn": "^1.22.10"
+    }
+}
