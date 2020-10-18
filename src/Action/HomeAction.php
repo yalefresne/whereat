@@ -21,6 +21,6 @@ class HomeAction
 
     public function __invoke()
     {
-        return $this->responder->render('index.html.twig');
+        return $this->responder->render('index.html.twig', []);
     }
 }
