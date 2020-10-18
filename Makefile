@@ -1,12 +1,11 @@
-DOCKER        = docker
-DOCKER_COMP   = docker-compose
-EXEC_PHP	  = $(DOCKER_COMP) exec -T php
-EXEC_JS	      = $(DOCKER_COMP) exec -T node
-SYMFONY       = $(EXEC_PHP) bin/console
-COMPOSER      = $(DOCKER_COMP) run --rm composer
-YARN 		  = $(EXEC_JS) yarn
-BASH_PHP	  = $(DOCKER_COMP) exec php bash
-BASH_JS 	  = $(DOCKER_COMP) run --rm node sh
+DOCKER_COMP = docker-compose
+EXEC_PHP    = $(DOCKER_COMP) exec -T php
+EXEC_JS     = $(DOCKER_COMP) run --rm node
+SYMFONY     = $(EXEC_PHP) bin/console
+COMPOSER    = $(DOCKER_COMP) run --rm composer
+YARN        = $(EXEC_JS) yarn
+BASH_PHP    = $(DOCKER_COMP) exec php bash
+BASH_JS     = $(EXEC_JS) sh
 
 .DEFAULT_GOAL := help
 help: ## Outputs this help screen
