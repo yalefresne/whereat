@@ -1,0 +1,15 @@
+name: "Check commiter"
+description: "Check if commiter is contributor already"
+author: "yalefresne@gmail.com"
+
+inputs:
+  URL:
+    description: "Contributors url"
+    required: true
+  COMMITER:
+    description: "Commiter"
+    required: true
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
