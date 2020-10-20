@@ -1,2 +1,2 @@
-import './styles/app.css';
-import './js/whereat.js';
+import 'Style/app.css';
+import 'App/whereat.js';

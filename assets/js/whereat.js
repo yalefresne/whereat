@@ -1,6 +1,6 @@
 import Vue from 'vue';
-import Welcome from './components/welcome';
-import Search from './components/search';
+import Welcome from 'Components/welcome';
+import Search from 'Components/search';
 
 document.addEventListener("DOMContentLoaded", function () {
     if (document.getElementById('app')) {
