@@ -21,6 +21,7 @@
         "build": "encore production --progress"
     },
     "dependencies": {
+        "webpack": "^5.2.0",
         "yarn": "^1.22.10"
     }
 }
