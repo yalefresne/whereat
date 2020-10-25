@@ -11,5 +11,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class PhoneNumber extends Constraint
 {
-    public $message = 'The phone number "{{ value }}" is not valid.';
+    public string $message = 'The phone number "{{ value }}" is not valid.';
 }

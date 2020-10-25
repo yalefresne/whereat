@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace App\Domain\Model;
 
 use App\Domain\Migrations\TablesNameCatalog;
-use DateTime;
+use App\Domain\Validator\PhoneNumber;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="TablesNameCatalog::RESTAURANTS")
+ * @ORM\Table(name=TablesNameCatalog::RESTAURANTS)
  */
 class Restaurant
 {
@@ -22,65 +21,49 @@ class Restaurant
      * @ORM\Id()
      * @ORM\Column(type="string", unique=true)
      * @Assert\Uuid
-     *
-     * @var string
      */
-    private $id;
+    private Uuid $id;
 
     /**
      * @ORM\Column(type="string", length=150)
      * @Assert\NotBlank()
-     *
-     * @var string
      */
-    private $name;
+    private string $name;
 
     /**
      * @ORM\Column(type="string", length=150, unique=true)
      * @Assert\NotBlank()
-     *
-     * @var string
      */
-    private $alias;
+    private string $alias;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Url
-     *
-     * @var string
      */
-    private $url;
+    private ?string $url;
 
     /**
      * @ORM\Column(type="string", length=20, nullable=true)
      * @PhoneNumber()
-     *
-     * @var string
      */
-    private $phoneNumber;
+    private ?string $phoneNumber;
 
     /**
      * @ORM\Column(type="datetime_immutable")
      * @Assert\NotNull()
-     *
-     * @var DateTimeImmutable
      */
-    private $created_at;
+    private DateTimeImmutable $createdAt;
 
     /**
      * @ORM\Column(type="datetime")
      * @Assert\NotNull()
-     *
-     * @var DateTime
      */
-    private $updated_at;
+    private DateTimeImmutable $updatedAt;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
-     *
-     * @var DateTime
      */
-    private $deleted_at;
+    private ?DateTimeImmutable $deletedAt;
 
     public function __construct()
     {
@@ -89,7 +72,7 @@ class Restaurant
         $this->setUpdatedAt();
     }
 
-    public function getId(): string
+    public function getId(): Uuid
     {
         return $this->id;
     }
@@ -99,7 +82,7 @@ class Restaurant
         return $this->name;
     }
 
-    public function setName($name): self
+    public function setName(string $name): self
     {
         $this->name = $name;
 
@@ -123,7 +106,7 @@ class Restaurant
         return $this->url;
     }
 
-    public function setUrl($url): self
+    public function setUrl(?string $url): self
     {
         $this->url = $url;
 
@@ -135,16 +118,16 @@ class Restaurant
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(string $phoneNumber): self
+    public function setPhoneNumber(?string $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?DateTimeInterface
+    public function getCreatedAt(): ?DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
     /**
@@ -152,14 +135,14 @@ class Restaurant
      */
     public function setCreatedAt(): self
     {
-        $this->created_at = new DateTimeImmutable();
+        $this->createdAt = new DateTimeImmutable();
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
-        return $this->updated_at;
+        return $this->updatedAt;
     }
 
     /**
@@ -173,14 +156,14 @@ class Restaurant
         return $this;
     }
 
-    public function getDeletedAt(): ?DateTimeInterface
+    public function getDeletedAt(): ?DateTimeImmutable
     {
-        return $this->deleted_at;
+        return $this->deletedAt;
     }
 
-    public function setDeletedAt(?\DateTimeImmutable $deleted_at): self
+    public function setDeletedAt(?DateTimeImmutable $deletedAt): self
     {
-        $this->deleted_at = $deleted_at;
+        $this->deletedAt = $deletedAt;
 
         return $this;
     }
