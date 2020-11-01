@@ -19,16 +19,6 @@ help: ## Outputs this help screen
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
 .PHONY: help
 
-.env.local: .env
-	@if [ -f .env.local ]; then \
-		echo '\033[1;41mYour .env.local file may be outdated because .env has changed.\033[0m';\
-		echo '\033[1;41mCheck your .env.local file, or run this command again to ignore.\033[0m';\
-		touch .env.local;\
-		exit 1;\
-	else\
-		cp .env .env.local;\
-	fi
-
 ## —— Initialize Project 🚀 ————————————————————————————————————————————————————
 init: gc up install ynstall ## Initialize the project
 
