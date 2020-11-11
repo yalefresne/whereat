@@ -28,3 +28,13 @@ if [[ -f yarn.lock ]]; then
         echo -e "$REDCOLOR yarn.lock has changed. You must run yarn$NOCOLOR"
     fi
 fi
+
+if [[ -f .env.local ]]; then
+    DIFF=`git diff --shortstat $PREV_COMMIT..$POST_COMMIT .env`
+    if [[ $DIFF != "" ]]; then
+		echo -e "$REDCOLOR Your .env.local file may be outdated because .env has changed.$NOCOLOR"
+		echo -e "$REDCOLOR Check your .env.local file.$NOCOLOR"
+    fi
+else
+   cp .env .env.local
+fi
