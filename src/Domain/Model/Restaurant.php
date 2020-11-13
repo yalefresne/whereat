@@ -50,18 +50,16 @@ class Restaurant
 
     /**
      * @ORM\Column(type="datetime_immutable")
-     * @Assert\NotNull()
      */
     private DateTimeImmutable $createdAt;
 
     /**
-     * @ORM\Column(type="datetime")
-     * @Assert\NotNull()
+     * @ORM\Column(type="datetime_immutable")
      */
     private DateTimeImmutable $updatedAt;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime_immutable", nullable=true)
      */
     private ?DateTimeImmutable $deletedAt;
 
@@ -151,7 +149,7 @@ class Restaurant
      */
     public function setUpdatedAt(): self
     {
-        $this->updated_at = new DateTimeImmutable();
+        $this->updatedAt = new DateTimeImmutable();
 
         return $this;
     }
