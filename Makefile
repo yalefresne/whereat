@@ -34,7 +34,7 @@ down: docker-compose.yaml ## Stop the docker hub
 
 ## —— Composer 🧙‍♂️ ————————————————————————————————————————————————————————————
 install: composer.lock ## Install vendors according to the current composer.lock file
-	$(COMPOSER) install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+	$(COMPOSER) install --no-progress --prefer-dist --optimize-autoloader
 
 update: composer.json ## Update vendors according to the composer.json file
 	$(COMPOSER) update $(COMMAND_ARGS)
