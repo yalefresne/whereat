@@ -12,12 +12,9 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class HomeAction
 {
-    private HtmlResponderInterface $responder;
-
-    public function __construct(HtmlResponderInterface $responder)
-    {
-        $this->responder = $responder;
-    }
+    public function __construct(
+       private HtmlResponderInterface $responder
+    ) {}
 
     public function __invoke()
     {
