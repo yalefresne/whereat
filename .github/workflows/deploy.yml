@@ -11,40 +11,42 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: actions/setup-node@v1
-      with:
-        version: 14.x
-
-    - name: Install dependencies
-      run: |
-        composer install --no-dev --no-progress --prefer-dist --optimize-autoloader
-        yarn install --production --check-files
-
-    - name: Sync
-      env:
-        dest: "${{ secrets.USERNAME }}@${{ secrets.HOST }}:/var/www/yannlefresne.tech"
-      run: |
-        echo "${{secrets.KEY}}" > deploy_key
-        chmod 600 ./deploy_key
-        rsync -chav --delete \
-          -e 'ssh -i ./deploy_key -o StrictHostKeyChecking=no' \
-          --exclude /deploy_key \
-          --exclude /.git/ \
-          --exclude /.github/ \
-          --exclude /.env \
-          --exclude /var/ \
-          --exclude /docker/ \
-          --exclude /docker-compose.yaml \
-          --exclude /Makefile \
-          ./ ${{env.dest}}
-
-    - name: Run migrations & Warm up cache
+    - name: Run script test
       uses: appleboy/ssh-action@master
+      env:
+        RELEASE_NB: "3"
+        PROJECT_PATH: "/var/www/yannlefresne.tech"
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
+        envs: RELEASE_NB,PROJECT_PATH
         script: |
-          cd /var/www/yannlefresne.tech/
+          RELEASE_DIR=$(date +%Y%m%d%H%M%S)
+
+          git clone -b feat/deploy-raspberry --depth 1 --single-branch git@github.com:yalefresne/whereat.git $PROJECT_PATH/releases/"$RELEASE_DIR"
+
+          cd $PROJECT_PATH/releases/
+          DIRCOUNT="$(find . -mindepth 1 -maxdepth 1 -type d | wc -l | xargs)"
+          echo $DIRCOUNT
+          if [ $DIRCOUNT -gt $RELEASE_NB ];then
+              rm -rf `ls -Ft | grep '/$' | tail -1`
+          fi
+
+          if [ -d $PROJECT_PATH/current ];then
+            rm -rf $PROJECT_PATH/current
+          fi
+
+          ln -s $PROJECT_PATH/releases/$RELEASE_DIR $PROJECT_PATH/current
+
+          if [ -f $PROJECT_PATH/current/.env ];then
+            rm $PROJECT_PATH/current/.env
+          fi
+
+          ln -s $PROJECT_PATH/shared/.env $PROJECT_PATH/current/.env
+
+          cd $PROJECT_PATH/current/
+
+          php ~/composer.phar install --no-progress --prefer-dist --optimize-autoloader
           php bin/console --no-interaction d:m:m
           php bin/console cache:warmup
