@@ -1,0 +1,6 @@
+---
+
+- name: "CUSTOM TASK 1/2 | AFTER UPDATE-CODE | npm install"
+  shell: /bin/bash -lc "yarn install"
+  args:
+    chdir: "{{ ansistrano_release_path.stdout }}"

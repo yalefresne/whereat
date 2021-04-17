@@ -1,0 +1,106 @@
+####################################
+#    ansistrano-deploy role var    #
+####################################
+
+ansistrano_deploy_from: "{{ playbook_dir }}" # Where my local project is (relative or absolute path)
+#ansistrano_deploy_to: "" # Base path to deploy to, for customization prefer using the host inventory file.
+ansistrano_version_dir: "releases" # Releases folder name
+ansistrano_current_dir: "current" # Softlink name. You should rarely changed it.
+ansistrano_current_via: "symlink" # Deployment strategy who code should be deployed to current path. Options are symlink or rsync
+# ansistrano_keep_releases: 5 # Releases to keep after a new deployment. See "Pruning old releases".
+
+# Arrays of directories and files to be shared.
+# The following arrays of directories and files will be symlinked to the current release directory after the 'update-code' step and its callbacks
+# Notes:
+# * Paths are relative to the /shared directory (no starting /)
+# * If your items are in a subdirectory, write the entire path to each shared directory
+#
+# Example:
+# ansistrano_shared_paths:
+#   - path/to/first-dir
+#   - path/next-dir
+# ansistrano_shared_files:
+#   - my-file.txt
+#   - path/to/file.txt
+ansistrano_shared_files: [".env"]
+
+
+# Shared paths and basedir shared files creation.
+# By default the shared paths directories and base directories for shared files are created automatically if not exists. But in some scenarios those paths could be symlinks to another directories in the filesystem, and the deployment process would fails. With these variables you can disable the involved tasks. If you have two or three shared paths, and don't need creation only for some of them, you always could disable the automatic creation and add a custom task in a hook.
+# ansistrano_ensure_shared_paths_exist: yes
+ansistrano_ensure_basedirs_shared_files_exist: yes
+
+ansistrano_deploy_via: "git"     # Method used to deliver the code to the server. Options are copy, rsync, git, svn, s3 or download. Copy, download and s3 have an optional step to unarchive the downloaded file which can be used by adding _unarchive. You can check all the options inside tasks/update-code folder!
+ansistrano_allow_anonymous_stats: false
+
+# Variables used in the Git deployment strategy
+ansistrano_git_repo: git@github.com:yalefresne/whereat.git     # Location of the git repository
+#ansistrano_git_branch: ""     # What version of the repository to check out. This can be the full 40-character SHA-1 hash, the literal string HEAD, a branch name, or a tag name, for customization prefer using the host inventory file.
+ansistrano_git_repo_tree: ""     # If specified the subtree of the repository to deploy
+ansistrano_git_identity_key_path: ""     # If specified this file is copied over and used as the identity key for the git commands, path is relative to the playbook in which it is used
+ansistrano_git_identity_key_remote_path: "/home/nnay/.ssh/id_ed25519"     # If specified this file on the remote server is used as the identity key for the git commands, remote path is absolute
+# Optional variables, omitted by default
+#ansistrano_git_refspec: ADDITIONAL_GIT_REFSPEC     # Additional refspec to be used by the 'git' module. Uses the same syntax as the 'git fetch' command.
+ansistrano_git_ssh_opts: "-o StrictHostKeyChecking=no"     # Additional ssh options to be used in Git
+ansistrano_git_depth: 1     # Additional history truncated to the specified number or revisions
+
+# Hooks: custom tasks if you need them, cf [https://github.com/ansistrano/deploy#main-workflow]
+#    ansistrano_before_setup_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-before-setup-tasks.yml"
+#    ansistrano_after_setup_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-after-setup-tasks.yml"
+#ansistrano_before_update_code_tasks_file: "{{ playbook_dir }}/tasks/my-before-update-code-tasks.yml"
+#ansistrano_after_update_code_tasks_file: "{{ playbook_dir }}/tasks/my-after-update-code-tasks.yml"
+#    ansistrano_before_symlink_shared_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-before-symlink-shared-tasks.yml"
+#    ansistrano_after_symlink_shared_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-after-symlink-shared-tasks.yml"
+#    ansistrano_before_symlink_tasks_file: "{{ playbook_dir }}/tasks/my-before-symlink-tasks.yml"
+#    ansistrano_after_symlink_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-after-symlink-tasks.yml"
+#    ansistrano_before_cleanup_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-before-cleanup-tasks.yml"
+#    ansistrano_after_cleanup_tasks_file: "{{ playbook_dir }}/<your-deployment-config>/my-after-cleanup-tasks.yml"
+
+
+# Hooks: custom task ansistrano-symfony, cf [https://github.com/cbrunnkvist/ansistrano-symfony-deploy/blob/master/README.md#hooks]
+ansistrano_symfony_before_composer_tasks_file: "{{ playbook_dir }}/tasks/ansistrano_symfony_before_composer_tasks_file.yml"
+#    ansistrano_symfony_after_composer_tasks_file
+#    ansistrano_symfony_before_assets_tasks_file
+#    ansistrano_symfony_after_assets_tasks_file
+#    ansistrano_symfony_before_assetic_tasks_file
+#    ansistrano_symfony_after_assetic_tasks_file
+ansistrano_symfony_before_cache_tasks_file: "{{ playbook_dir }}/tasks/ansistrano_symfony_before_cache_tasks_file.yml"
+#    ansistrano_symfony_after_cache_tasks_file
+#    ansistrano_symfony_before_doctrine_tasks_file
+#    ansistrano_symfony_after_doctrine_tasks_file
+#    ansistrano_symfony_before_mongodb_tasks_file
+#    ansistrano_symfony_after_mongodb_tasks_file
+
+
+############################################
+#    ansistrano-symfony-deploy role var    #
+############################################
+
+symfony_env: prod
+symfony_php_path: php7.4 # The PHP executable to use for all command line tasks
+
+symfony_console_path: 'bin/console' # If using Symfony 3+ this should be 'bin/console'
+
+symfony_run_composer: true
+# symfony_composer_path: "{{ ansistrano_deploy_to }}/composer.phar"
+symfony_composer_options: '--no-interaction --optimize-autoloader --prefer-dist'
+symfony_composer_self_update: false
+
+symfony_run_assets_install: true
+symfony_assets_options: '--no-interaction'
+
+symfony_run_assetic_dump: true
+symfony_assetic_options: '--no-interaction'
+
+symfony_run_cache_clear_and_warmup: true
+symfony_cache_options: ''
+
+symfony_run_doctrine_migrations: false
+symfony_doctrine_options: '--no-interaction'
+
+symfony_run_mongodb_schema_update: false
+symfony_mongodb_options: ''
+
+ansible_ssh_host_key_checking: false
+
+node_version: '12.18'

@@ -5,133 +5,119 @@ on:
     branches: [ feat/deploy-raspberry ]
 
 jobs:
-  build:
-    name: build
+  # build:
+  #   name: Build
+  #   runs-on: ${{ matrix.os }}
+
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #         os: [ubuntu-latest]
+  #         php: [7.4]
+  #         node: [12]
+  #         mariaDb: [10.3]
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: Setup PHP
+  #       uses: shivammathur/setup-php@v2
+  #       with:
+  #           php-version: "${{ matrix.php }}"
+  #           extensions: intl
+  #           tools: symfony
+  #           coverage: none
+
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v1
+  #       with:
+  #           node-version: "${{ matrix.node }}"
+
+  #     - name: Shutdown default MySQL
+  #       run: sudo service mysql stop
+
+  #     - name: Setup MySQL
+  #       uses: getong/mariadb-action@v1.1
+  #       with:
+  #         mariadb version: "${{ matrix.mariaDb }}"
+  #         mysql user: 'youruser'
+  #         mysql password: 'yourpassword'
+  #         mysql database: 'whereat'
+
+  #     - name: Output PHP version for Symfony CLI
+  #       run: php -v | head -n 1 | awk '{ print $2 }' > .php-version
+
+  #     - name: Get Composer cache directory
+  #       id: composer-cache
+  #       run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+  #     - name: Cache Composer
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: ${{ steps.composer-cache.outputs.dir }}
+  #         key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-composer-
+
+  #     - name: Install PHP dependencies
+  #       run: composer install --no-interaction
+
+  #     - name: Get Yarn cache directory
+  #       id: yarn-cache
+  #       run: echo "::set-output name=dir::$(yarn cache dir)"
+
+  #     - name: Cache Yarn
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: ${{ steps.yarn-cache.outputs.dir }}
+  #         key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-yarn-
+  #     - name: Install JS dependencies
+  #       run: yarn install
+
+  #     - name: Prepare test application database
+  #       run: |
+  #         bin/console doctrine:migrations:migrate -n -vvv
+
+  #     - name: Prepare test application assets
+  #       run: yarn build
+
+  #     - name: Prepare test application cache
+  #       run: bin/console cache:warmup -vvv
+
+  deploy:
+    name: Deploy
+    # needs: build
     runs-on: ${{ matrix.os }}
-    env:
-      working_directory: ./back
+    container:
+      image: webdevops/ansible:debian-9
 
     strategy:
       fail-fast: false
       matrix:
-          os: [ubuntu-latest]
-          php: [7.4]
-          node: [14]
-          mysql: [8.0]
+        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-            php-version: "${{ matrix.php }}"
-            extensions: intl
-            tools: symfony
-            coverage: none
-
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-            node-version: "${{ matrix.node }}"
-
-      - name: Shutdown default MySQL
-        run: sudo service mysql stop
-
-      - name: Setup MySQL
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql version: "${{ matrix.mysql }}"
-          mysql root password: "root"
-          mysql database: "whereat"
-
-      - name: Output PHP version for Symfony CLI
-        run: php -v | head -n 1 | awk '{ print $2 }' > .php-version
-
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-
-      - name: Cache Composer
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install PHP dependencies
-        run: composer install --no-interaction
-
-      - name: Get Yarn cache directory
-        id: yarn-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Cache Yarn
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Install JS dependencies
-        run: yarn install
-
-      - run: docker ps -a
-
-      - name: Prepare test application database
+      - name: Creating log file for ansible
         run: |
-          APP_DEBUG=1 bin/console doctrine:database:create -vvv
-          bin/console doctrine:migrations:migrate -n -vvv
+          mkdir /tmp/log && touch /tmp/log/ansible.log && mkdir /etc/ansible && touch /etc/ansible/ansible.cfg
+          echo "[defaults]\nlog_path = /tmp/log/ansible.log\nstdout_callback = yaml\nset force_color = 1\nprivate_key_file = /.ssh/id_rsa" > /etc/ansible/ansible.cfg;
 
-      - name: Prepare test application assets
-        run: yarn build
+      - name: set ansible deploy key
+        run: |
+          mkdir /.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > /.ssh/id_rsa
+          chmod 600 /.ssh/id_rsa
 
-      - name: Prepare test application cache
-        run: bin/console cache:warmup -vvv
+      - name: "install ansible roles"
+        run: ansible-galaxy install cbrunnkvist.ansistrano-symfony-deploy
 
-  deploy:
-    runs-on: ubuntu-latest
+      - name: "install ssh and curl"
+        run: apt-get update && apt-get install -y ssh curl
 
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Run script test
-      uses: appleboy/ssh-action@master
-      env:
-        RELEASE_NB: "3"
-        PROJECT_PATH: "/var/www/yannlefresne.tech"
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
-        envs: RELEASE_NB,PROJECT_PATH
-        script: |
-          RELEASE_DIR=$(date +%Y%m%d%H%M%S)
-
-          git clone -b feat/deploy-raspberry --depth 1 --single-branch git@github.com:yalefresne/whereat.git $PROJECT_PATH/releases/$RELEASE_DIR
-
-          cd $PROJECT_PATH/releases/
-          DIRCOUNT="$(find . -mindepth 1 -maxdepth 1 -type d | wc -l | xargs)"
-          echo $DIRCOUNT
-          if [ $DIRCOUNT -gt $RELEASE_NB ];then
-              rm -rf `ls -Ft | grep '/$' | tail -1`
-          fi
-
-          if [ -d $PROJECT_PATH/current ];then
-            rm -rf $PROJECT_PATH/current
-          fi
-
-          ln -s $PROJECT_PATH/releases/$RELEASE_DIR $PROJECT_PATH/current
-
-          if [ -f $PROJECT_PATH/current/.env ];then
-            rm $PROJECT_PATH/current/.env
-          fi
-
-          ln -s $PROJECT_PATH/shared/.env $PROJECT_PATH/current/.env
-
-          cd $PROJECT_PATH/current/
-
-          php ~/composer.phar install --no-progress --prefer-dist --optimize-autoloader
-          php bin/console --no-interaction d:m:m
-          php bin/console cache:warmup
+      - name: "deployment"
+        run: |
+          ansible-playbook -i ansistrano/hosts ansistrano/deploy.yml

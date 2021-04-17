@@ -1,0 +1,11 @@
+[production]
+raspberry
+
+[production:vars]
+ansible_host=yannlefresne.tech
+ansible_user="nnay"
+ansible_port=22
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ForwardAgent=yes'
+ansistrano_git_branch="feat/deploy-raspberry"
+ansistrano_deploy_to="/var/www/yannlefresne.tech"
+ansistrano_keep_releases=3
