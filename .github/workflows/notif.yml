@@ -1,0 +1,37 @@
+name: notif
+
+on:
+  push:
+    branches: [ feat/deploy-raspberry ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ job.status }}
+
+    steps:
+      - run: echo "Test build"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      status: ${{ job.status }}
+
+    steps:
+      - run: echop "Test deploy"
+
+  slack_notification:
+    needs: [build, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    name: Slack Notification
+    steps:
+    - name: Send Notification
+      uses: yalefresne/slack-notification-action@feat/refacto
+      with:
+        webhook_slack: ${{ secrets.WEBHOOK_SLACK }}
+        channel_name: "test"
+        build_status: ${{ needs.build.outputs.status }}
+        deploy_status: ${{ needs.deploy.outputs.status }}

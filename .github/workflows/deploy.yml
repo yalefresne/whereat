@@ -2,7 +2,7 @@ name: Deployment
 
 on:
   push:
-    branches: [ feat/deploy-raspberry ]
+    branches: [ master ]
 
 jobs:
   # build:
@@ -90,6 +90,8 @@ jobs:
     name: Deploy
     # needs: build
     runs-on: ${{ matrix.os }}
+    outputs:
+      status: ${{ job.status }}
     container:
       image: webdevops/ansible:debian-9
 
@@ -101,23 +103,36 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Creating log file for ansible
-        run: |
-          mkdir /tmp/log && touch /tmp/log/ansible.log && mkdir /etc/ansible && touch /etc/ansible/ansible.cfg
-          echo "[defaults]\nlog_path = /tmp/log/ansible.log\nstdout_callback = yaml\nset force_color = 1\nprivate_key_file = /.ssh/id_rsa" > /etc/ansible/ansible.cfg;
+      # - name: Creating log file for ansible
+      #   run: |
+      #     mkdir /tmp/log && touch /tmp/log/ansible.log && mkdir /etc/ansible && touch /etc/ansible/ansible.cfg
+      #     echo "[defaults]\nlog_path = /tmp/log/ansible.log\nstdout_callback = yaml\nset force_color = 1\nprivate_key_file = /.ssh/id_rsa" > /etc/ansible/ansible.cfg;
 
       - name: set ansible deploy key
         run: |
-          mkdir /.ssh
           echo "${{ secrets.DEPLOY_KEY }}" > /.ssh/id_rsa
           chmod 600 /.ssh/id_rsa
 
-      - name: "install ansible roles"
-        run: ansible-galaxy install cbrunnkvist.ansistrano-symfony-deploy
+      # - name: "install ansible roles"
+      #   run: ansible-galaxy install cbrunnkvist.ansistrano-symfony-deploy
 
-      - name: "install ssh and curl"
-        run: apt-get update && apt-get install -y ssh curl
+      # - name: "install ssh and curl"
+      #   run: apt-get update && apt-get install -y ssh curl
 
       - name: "deployment"
         run: |
           ansible-playbook -i ansistrano/hosts ansistrano/deploy.yml
+
+  slack_notification:
+    runs-on: ubuntu-latest
+    name: Slack Notification
+    needs: deploy
+    if: always()
+    steps:
+    - name: Send Notification
+      uses: yalefresne/slack-notification-action@v1
+      with:
+        webhook-slack: "https://hooks.slack.com/services/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"
+        channel-name: "test"
+        build-status: "${{ needs.deploy.outputs.status }}"
+        deploy-status: "${{ needs.deploy.outputs.status }}"
