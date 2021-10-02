@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Migrations;
+namespace Whereat\Domain\Migrations;
 
 interface TablesNameCatalog
 {

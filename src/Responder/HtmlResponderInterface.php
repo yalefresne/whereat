@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Responder;
+namespace Whereat\Responder;
 
 use Symfony\Component\HttpFoundation\Response;
 

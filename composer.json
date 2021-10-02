@@ -36,12 +36,12 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "Whereat\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "App\\Tests\\": "tests/"
+            "Whereat\\Tests\\": "tests/"
         }
     },
     "replace": {
