@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Migrations;
+namespace Whereat\Domain\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;

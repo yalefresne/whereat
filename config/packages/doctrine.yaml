@@ -14,5 +14,5 @@ doctrine:
                 is_bundle: false
                 type: annotation
                 dir: '%kernel.project_dir%/src/Domain/Model'
-                prefix: 'App\Domain\Model'
+                prefix: 'Whereat\Domain\Model'
                 alias: App

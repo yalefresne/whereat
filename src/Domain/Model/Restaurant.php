@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Domain\Model;
+namespace Whereat\Domain\Model;
 
 use App\Domain\Migrations\TablesNameCatalog;
 use App\Domain\Validator\PhoneNumber;

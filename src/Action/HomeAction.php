@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Action;
+namespace Whereat\Action;
 
-use App\Responder\HtmlResponderInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Whereat\Responder\HtmlResponderInterface;
 
 /**
  * @Route(path="/")
