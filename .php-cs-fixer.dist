@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-$finder = PhpCsFixer\Finder::create()
-    ->in('src')
-    ->notPath('Kernel.php');
+$finder = (new PhpCsFixer\Finder())
+    ->in(__DIR__)
+    ->exclude('var');
 
-return PhpCsFixer\Config::create()
+return (new PhpCsFixer\Config())
     ->setRules([
         '@Symfony' => true,
         '@PHP71Migration' => true,

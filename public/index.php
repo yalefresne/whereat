@@ -1,9 +1,11 @@
 <?php
 
-use Whereat\Kernel;
+declare(strict_types=1);
+
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\HttpFoundation\Request;
+use Whereat\Kernel;
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
