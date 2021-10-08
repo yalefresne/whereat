@@ -6,9 +6,7 @@ namespace Whereat\Domain\Validator;
 
 use Symfony\Component\Validator\Constraint;
 
-/**
- * @Annotation
- */
+#[\Attribute]
 class PhoneNumber extends Constraint
 {
     public string $message = 'The phone number "{{ value }}" is not valid.';

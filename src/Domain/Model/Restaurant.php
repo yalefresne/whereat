@@ -4,63 +4,46 @@ declare(strict_types=1);
 
 namespace Whereat\Domain\Model;
 
-use App\Domain\Migrations\TablesNameCatalog;
-use App\Domain\Validator\PhoneNumber;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
+use Whereat\Domain\Migrations\TablesNameCatalog;
+use Whereat\Domain\Validator\PhoneNumber;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name=TablesNameCatalog::RESTAURANTS)
- */
+#[ORM\Entity(repositoryClass: TablesNameCatalog::RESTAURANTS)]
+#[ORM\Table(name: "restaurants")]
 class Restaurant
 {
-    /**
-     * @ORM\Id()
-     * @ORM\Column(type="string", unique=true)
-     * @Assert\Uuid
-     */
+    #[ORM\Id, ORM\Column(type: 'string')]
+    #[Assert\Uuid]
     private Uuid $id;
 
-    /**
-     * @ORM\Column(type="string", length=150)
-     * @Assert\NotBlank()
-     */
+    #[ORM\Column(type: 'string', length: 150)]
+    #[Assert\NotBlank]
     private string $name;
 
-    /**
-     * @ORM\Column(type="string", length=150, unique=true)
-     * @Assert\NotBlank()
-     */
+    #[ORM\Column(type: 'string', length: 150, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Unique]
     private string $alias;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Assert\Url
-     */
+    #[ORM\Column(type: 'string', length: 150, nullable: true)]
+    #[Assert\Url]
     private ?string $url;
 
-    /**
-     * @ORM\Column(type="string", length=20, nullable=true)
-     * @PhoneNumber()
-     */
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[PhoneNumber]
     private ?string $phoneNumber;
 
-    /**
-     * @ORM\Column(type="datetime_immutable")
-     */
+    #[ORM\Column(type: 'datetime_immutable')]
     private DateTimeImmutable $createdAt;
 
-    /**
-     * @ORM\Column(type="datetime_immutable")
-     */
+    #[ORM\Column(type: 'datetime_immutable')]
     private DateTimeImmutable $updatedAt;
 
-    /**
-     * @ORM\Column(type="datetime_immutable", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private ?DateTimeImmutable $deletedAt;
 
     public function __construct()
@@ -128,9 +111,7 @@ class Restaurant
         return $this->createdAt;
     }
 
-    /**
-     * @ORM\PrePersist
-     */
+    #[ORM\PrePersist]
     public function setCreatedAt(): self
     {
         $this->createdAt = new DateTimeImmutable();
@@ -143,10 +124,8 @@ class Restaurant
         return $this->updatedAt;
     }
 
-    /**
-     * @ORM\PrePersist
-     * @ORM\PreUpdate
-     */
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
     public function setUpdatedAt(): self
     {
         $this->updatedAt = new DateTimeImmutable();
